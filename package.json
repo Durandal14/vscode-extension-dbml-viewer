@@ -1,0 +1,74 @@
+{
+  "name": "dbml-viewer",
+  "displayName": "DBML viewer",
+  "description": "Generates a render view of DBML files",
+  "version": "0.0.1",
+  "publisher": "Nicolas LIGER",
+  "engines": {
+    "vscode": "^1.77.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "files": [
+    "out/**/*",
+    "media/**/*"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "menus": {
+      "editor/title": [
+        {
+          "command": "extension.generateDbmlGraph",
+          "group": "navigation",
+          "when": "resourceLangId == dbml"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "extension.generateDbmlGraph",
+        "title": "Visualize DBML Graph",
+        "icon": {
+          "light": "./icons/view-light.svg",
+          "dark": "./icons/view-dark.svg"
+        }
+      },
+      {
+        "command": "extension.generateDbmlSvg",
+        "title": "Generate DBML Graph SVG"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^16.18.25",
+    "@types/vscode": "^1.77.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "@vscode/test-electron": "^2.3.0",
+    "eslint": "^8.39.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.4",
+    "webpack": "^5.81.0",
+    "webpack-cli": "^5.0.2"
+  },
+  "dependencies": {
+    "@softwaretechnik/dbml-renderer": "^1.0.27"
+  }
+}
