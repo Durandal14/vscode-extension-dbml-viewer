@@ -1,1 +1,0 @@
-# vscode-extension-dbml-viewer
