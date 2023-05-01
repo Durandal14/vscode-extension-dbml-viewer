@@ -138,11 +138,11 @@ export function activate(context: vscode.ExtensionContext) {
     const watcher = vscode.workspace.createFileSystemWatcher('**/*.dbml');
     const webviewPanels = new Map<string, vscode.WebviewPanel>();
     context.subscriptions.push(watcher);
-    watcher.onDidChange(async (event) => {
-        const document = await vscode.workspace.openTextDocument(event);
+
+    const updateWebview = async (document: vscode.TextDocument) => {
         const dbmlContent = document.getText();
         const svgContent = await generateSvg(dbmlContent);
-        // Check if there is an existing webview panel for the document
+
         let panel = webviewPanels.get(document.uri.toString());
         if (panel) {
             panel.webview.html = getHtmlForWebview(panel.webview, svgContent);
@@ -155,19 +155,30 @@ export function activate(context: vscode.ExtensionContext) {
                     enableScripts: true,
                     localResourceRoots: [],
                 }
-                );
-                panel.webview.html = getHtmlForWebview(panel.webview, svgContent);
-                
-                // Store the webview panel in the map
-                webviewPanels.set(document.uri.toString(), panel);
-                
-                // Dispose the webview panel when it is closed
-                panel.onDidDispose(() => {
-                    webviewPanels.delete(document.uri.toString());
-                });
-            }
-        });
-    }
-        
+            );
+            panel.webview.html = getHtmlForWebview(panel.webview, svgContent);
+
+            webviewPanels.set(document.uri.toString(), panel);
+
+            panel.onDidDispose(() => {
+                webviewPanels.delete(document.uri.toString());
+            });
+        }
+    };
+
+    watcher.onDidChange(async (event) => {
+        const document = await vscode.workspace.openTextDocument(event);
+        updateWebview(document);
+    });
+
+    // Ajouter un écouteur pour les modifications de document
+    vscode.workspace.onDidChangeTextDocument(async (event) => {
+        if (event.document.languageId === 'dbml') {
+            updateWebview(event.document);
+        }
+    });
+}
+
+
 export function deactivate() {}
                 
