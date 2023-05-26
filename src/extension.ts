@@ -220,6 +220,4 @@ class DbmlDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
     }
 }
 
-
-
-export function deactivate() {}
+export function deactivate() { }

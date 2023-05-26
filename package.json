@@ -1,7 +1,7 @@
 {
   "name": "dbml-viewer",
-  "displayName": "DBML viewer",
-  "description": "Generates a render view of DBML files",
+  "displayName": "DBML Live Preview",
+  "description": "Generates a render view of DBML language files",
   "version": "0.0.2",
   "icon": "icons/DBMLViewer.png",
   "publisher": "Nicolas Liger",
