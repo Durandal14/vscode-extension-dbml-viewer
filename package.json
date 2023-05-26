@@ -30,7 +30,7 @@
     "commands": [
       {
         "command": "extension.generateDbmlGraph",
-        "title": "Visualize DBML Graph",
+        "title": "DBML: Visualize DBML Graph",
         "icon": {
           "light": "./icons/view-light.svg",
           "dark": "./icons/view-dark.svg"
@@ -38,7 +38,7 @@
       },
       {
         "command": "extension.generateDbmlSvg",
-        "title": "Generate DBML Graph SVG"
+        "title": "DBML: Download SVG view"
       }
     ]
   },

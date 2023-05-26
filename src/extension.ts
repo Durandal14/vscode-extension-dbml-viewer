@@ -152,6 +152,13 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
+    // Structure
+    let provider = vscode.languages.registerDocumentSymbolProvider(
+        { scheme: 'file', language: 'dbml' },
+        new DbmlDocumentSymbolProvider()
+    );
+    context.subscriptions.push(provider);
+
     // Mettez à jour la WebView lors de la modification d'un fichier DBML
     vscode.workspace.onDidChangeTextDocument(async (event) => {
         if (event.document.languageId === 'dbml') {
@@ -167,5 +174,52 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 }
+
+class DbmlDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
+    provideDocumentSymbols(
+        document: vscode.TextDocument,
+        token: vscode.CancellationToken
+    ): Thenable<vscode.DocumentSymbol[]> {
+        let symbols: vscode.DocumentSymbol[] = [];
+
+        let tableRegex = /Table\s+([a-zA-Z_][a-zA-Z0-9_]*)/g;
+        let enumRegex = /Enum\s+([a-zA-Z_][a-zA-Z0-9_]*)/g;
+        let refRegex = /Ref:\s+([a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*)\s*[><]\s*([a-zA-Z_][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)/g;
+
+        this.findSymbols(document, tableRegex, vscode.SymbolKind.Class, symbols);
+        this.findSymbols(document, enumRegex, vscode.SymbolKind.Enum, symbols);
+        this.findSymbols(document, refRegex, vscode.SymbolKind.Object, symbols);
+
+        return Promise.resolve(symbols);
+    }
+
+    private findSymbols(
+        document: vscode.TextDocument,
+        regex: RegExp,
+        kind: vscode.SymbolKind,
+        symbols: vscode.DocumentSymbol[]
+    ) {
+        let match;
+
+        while (match = regex.exec(document.getText())) {
+            let range = new vscode.Range(
+                document.positionAt(match.index),
+                document.positionAt(match.index + match[0].length)
+            );
+
+            let symbolInfo = new vscode.DocumentSymbol(
+                match[1],
+                '',
+                kind,
+                range,
+                range
+            );
+
+            symbols.push(symbolInfo);
+        }
+    }
+}
+
+
 
 export function deactivate() {}
