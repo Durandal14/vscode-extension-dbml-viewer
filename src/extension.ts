@@ -3,6 +3,9 @@ import { run } from '@softwaretechnik/dbml-renderer';
 
 let webviewPanel: vscode.WebviewPanel | null = null;
 
+// Gardez une trace du dernier SVG réussi
+let lastSuccessfulSvg: string = '';
+
 // Génère un contenu SVG à partir d'un contenu DBML
 async function generateSvg(dbmlContent: string): Promise<string> {
     try {
@@ -60,7 +63,6 @@ function getHtmlForWebview(webview: vscode.Webview, svgContent: string): string 
     </html>`;
 }
 
-// Fonction pour générer et afficher la WebView avec le contenu DBML
 async function showDbmlGraphWebView() {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
@@ -71,6 +73,11 @@ async function showDbmlGraphWebView() {
     const document = editor.document;
     const dbmlContent = document.getText();
     const svgContent = await generateSvg(dbmlContent);
+
+    // Si la génération du SVG a réussi, mettez à jour le dernier SVG réussi
+    if (svgContent) {
+        lastSuccessfulSvg = svgContent;
+    }
 
     if (!webviewPanel) {
         webviewPanel = vscode.window.createWebviewPanel(
@@ -85,11 +92,13 @@ async function showDbmlGraphWebView() {
         });
     }
 
-    webviewPanel.webview.html = getHtmlForWebview(webviewPanel.webview, svgContent);
+    // Utilisez le dernier SVG réussi pour l'affichage
+    webviewPanel.webview.html = getHtmlForWebview(webviewPanel.webview, lastSuccessfulSvg);
     if (!webviewPanel.visible) {
         webviewPanel.reveal(vscode.ViewColumn.Beside, false);
     }
 }
+
 
 // Fonction pour enregistrer le contenu DBML en tant que fichier SVG
 async function saveDbmlAsSvg() {
