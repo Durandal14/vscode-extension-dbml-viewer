@@ -6,6 +6,9 @@ let webviewPanel: vscode.WebviewPanel | null = null;
 // Gardez une trace du dernier SVG réussi
 let lastSuccessfulSvg: string = '';
 
+// Gardez une trace du dernier délai
+let lastTimeout: NodeJS.Timeout | null = null;
+
 // Génère un contenu SVG à partir d'un contenu DBML
 async function generateSvg(dbmlContent: string): Promise<string> {
     try {
@@ -149,10 +152,18 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    // Mise à jour de la WebView lors de la modification d'un fichier DBML
+    // Mettez à jour la WebView lors de la modification d'un fichier DBML
     vscode.workspace.onDidChangeTextDocument(async (event) => {
         if (event.document.languageId === 'dbml') {
-            showDbmlGraphWebView();
+            // Si un délai a déjà été défini, le supprime
+            if (lastTimeout) {
+                clearTimeout(lastTimeout);
+            }
+
+            // Définir un nouveau délai
+            lastTimeout = setTimeout(() => {
+                showDbmlGraphWebView();
+            }, 200); // 200ms
         }
     });
 }
