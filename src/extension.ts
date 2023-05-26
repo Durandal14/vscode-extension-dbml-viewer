@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
-import * as cp from 'child_process';
-import * as path from 'path';
 import { run } from '@softwaretechnik/dbml-renderer';
 
+let webviewPanel: vscode.WebviewPanel | null = null;
+
+// Génère un contenu SVG à partir d'un contenu DBML
 async function generateSvg(dbmlContent: string): Promise<string> {
     try {
         const svgContent = run(dbmlContent, 'svg');
@@ -18,6 +19,7 @@ async function generateSvg(dbmlContent: string): Promise<string> {
     }
 }
 
+// Génère le code HTML pour la WebView à partir du contenu SVG
 function getHtmlForWebview(webview: vscode.Webview, svgContent: string): string {
     const nonce = new Date().getTime() + '' + new Date().getMilliseconds();
     return `<!DOCTYPE html>
@@ -42,6 +44,7 @@ function getHtmlForWebview(webview: vscode.Webview, svgContent: string): string 
         display: flex;
         align-items: center;
         justify-content: center;
+        background-color: #fff;
     }
     svg {
         max-width: 100%;
@@ -57,128 +60,92 @@ function getHtmlForWebview(webview: vscode.Webview, svgContent: string): string 
     </html>`;
 }
 
-export function activate(context: vscode.ExtensionContext) {
-    console.log('Congratulations, your extension "dbml-viewer" is now active!');
-    
-    let disposable = vscode.commands.registerCommand('extension.generateDbmlGraph', () => {
-        const panel = vscode.window.createWebviewPanel(
+// Fonction pour générer et afficher la WebView avec le contenu DBML
+async function showDbmlGraphWebView() {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        vscode.window.showErrorMessage('No active text editor found. Open a DBML file to render it.');
+        return;
+    }
+
+    const document = editor.document;
+    const dbmlContent = document.getText();
+    const svgContent = await generateSvg(dbmlContent);
+
+    if (!webviewPanel) {
+        webviewPanel = vscode.window.createWebviewPanel(
             'dbmlRenderer',
             'DBML Renderer',
             vscode.ViewColumn.Beside,
             {}
-            );
-            
-        const editor = vscode.window.activeTextEditor;
-        if (editor) {
-            const document = editor.document;
-            const dbmlCode = document.getText();
-            
-            // Test pour compatibilité Windows
-            const isWindows = process.platform === 'win32';
-            const dbmlRendererPath = path.join(
-                __dirname,
-                '..',
-                'node_modules',
-                '.bin',
-                isWindows ? 'dbml-renderer.cmd' : 'dbml-renderer'
-                );
-                
-                const renderer = cp.spawn(dbmlRendererPath, ['-i', '-', '-f', 'svg'], { shell: true });
-                renderer.stdin.write(dbmlCode);
-                renderer.stdin.end();
-                
-                let svgCode = '';
-                
-                renderer.stdout.on('data', (data) => {
-                    svgCode += data;
-                });
-                
-                renderer.stdout.on('end', () => {
-                    panel.webview.html = getHtmlForWebview(panel.webview, svgCode);
-                });
-                
-                renderer.stderr.on('data', ( data) => {
-                    console.error(`dbml-renderer error: ${data}`);
-                });
-            } else {
-                vscode.window.showErrorMessage('No active text editor found. Open a DBML file to render it.');
-            }
-        });
-        
-        context.subscriptions.push(disposable);
-            
-    // Save SVG
-    context.subscriptions.push(
-        vscode.commands.registerCommand('extension.generateDbmlSvg', async () => {
-            const editor = vscode.window.activeTextEditor;
-            if (!editor) {
-                return;
-            }
-            const dbmlContent = editor.document.getText();
-            const svgContent = await generateSvg(dbmlContent);
-            if (!svgContent) {
-                return;
-            }
-            
-            const uri = await vscode.window.showSaveDialog({
-                filters: {
-                    images: ['svg']
-                },
-                saveLabel: 'Save SVG'
-            });
-            
-            if (uri) {
-                await vscode.workspace.fs.writeFile(uri, Buffer.from(svgContent, 'utf-8'));
-                vscode.window.showInformationMessage('SVG file saved successfully.');
-            }
-        })
         );
-        
-    // Watch for DBML changes and regenerate WebView
-    const watcher = vscode.workspace.createFileSystemWatcher('**/*.dbml');
-    const webviewPanels = new Map<string, vscode.WebviewPanel>();
-    context.subscriptions.push(watcher);
 
-    const updateWebview = async (document: vscode.TextDocument) => {
-        const dbmlContent = document.getText();
-        const svgContent = await generateSvg(dbmlContent);
+        webviewPanel.onDidDispose(() => {
+            webviewPanel = null;
+        });
+    }
 
-        let panel = webviewPanels.get(document.uri.toString());
-        if (panel) {
-            panel.webview.html = getHtmlForWebview(panel.webview, svgContent);
-        } else {
-            panel = vscode.window.createWebviewPanel(
-                'dbmlGraph',
-                'DBML Graph',
-                vscode.ViewColumn.Beside,
-                {
-                    enableScripts: true,
-                    localResourceRoots: [],
-                }
-            );
-            panel.webview.html = getHtmlForWebview(panel.webview, svgContent);
+    webviewPanel.webview.html = getHtmlForWebview(webviewPanel.webview, svgContent);
+    if (!webviewPanel.visible) {
+        webviewPanel.reveal(vscode.ViewColumn.Beside, false);
+    }
+}
 
-            webviewPanels.set(document.uri.toString(), panel);
+// Fonction pour enregistrer le contenu DBML en tant que fichier SVG
+async function saveDbmlAsSvg() {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        return;
+    }
+    const dbmlContent = editor.document.getText();
+    const svgContent = await generateSvg(dbmlContent);
+    if (!svgContent) {
+        return;
+    }
 
-            panel.onDidDispose(() => {
-                webviewPanels.delete(document.uri.toString());
-            });
-        }
-    };
-
-    watcher.onDidChange(async (event) => {
-        const document = await vscode.workspace.openTextDocument(event);
-        updateWebview(document);
+    const uri = await vscode.window.showSaveDialog({
+        filters: {
+            images: ['svg']
+        },
+        saveLabel: 'Save SVG'
     });
 
-    // Ajouter un écouteur pour les modifications de document
+    if (uri) {
+        await vscode.workspace.fs.writeFile(uri, Buffer.from(svgContent, 'utf-8'));
+        vscode.window.showInformationMessage('SVG file saved successfully.');
+    }
+}
+
+export function activate(context: vscode.ExtensionContext) {
+    console.log('Congratulations, your extension "dbml-viewer" is now active!');
+
+    // Enregistrement des commandes
+    context.subscriptions.push(vscode.commands.registerCommand('extension.generateDbmlGraph', showDbmlGraphWebView));
+    context.subscriptions.push(vscode.commands.registerCommand('extension.generateDbmlSvg', saveDbmlAsSvg));
+
+    // Création du File System Watcher pour les fichiers DBML
+    const watcher = vscode.workspace.createFileSystemWatcher('**/*.dbml');
+    context.subscriptions.push(watcher);
+
+    // Mise à jour de la WebView lors de la modification d'un fichier DBML
+    watcher.onDidChange(async (event) => {
+        const document = await vscode.workspace.openTextDocument(event);
+        showDbmlGraphWebView();
+    });
+
+    // Mise à jour de la WebView lors de l'ouverture d'un fichier DBML
+    vscode.workspace.onDidOpenTextDocument(async (document) => {
+        if (document.languageId === 'dbml') {
+            showDbmlGraphWebView();
+        }
+    });
+
+    // Mise à jour de la WebView lors de la modification d'un fichier DBML
     vscode.workspace.onDidChangeTextDocument(async (event) => {
         if (event.document.languageId === 'dbml') {
-            updateWebview(event.document);
+            showDbmlGraphWebView();
         }
     });
 }
 
-
 export function deactivate() {}
-                

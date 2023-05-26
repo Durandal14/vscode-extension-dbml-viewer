@@ -2,8 +2,9 @@
   "name": "dbml-viewer",
   "displayName": "DBML viewer",
   "description": "Generates a render view of DBML files",
-  "version": "0.0.1",
-  "publisher": "Nicolas LIGER",
+  "version": "0.0.2",
+  "icon": "icons/DBMLViewer.png",
+  "publisher": "Nicolas Liger",
   "engines": {
     "vscode": "^1.77.0"
   },
