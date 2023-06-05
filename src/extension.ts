@@ -175,6 +175,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
 }
 
+// Code Structrure with Table, Enum and Ref keywords
 class DbmlDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
     provideDocumentSymbols(
         document: vscode.TextDocument,
