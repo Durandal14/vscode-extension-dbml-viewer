@@ -12,6 +12,8 @@ Table users {
   username varchar
   role varchar
   created_at timestamp
+  numero decimal(10)
+
 }
 
 Table posts {

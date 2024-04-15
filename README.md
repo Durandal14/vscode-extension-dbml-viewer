@@ -5,24 +5,23 @@
 
 An extension for Visual Studio Code that provides real-time rendering of a database schema from the generated DBML code.
 
-
 ## Features
 
-- Light/dark mode toggle
-- Live previews
-- Fullscreen mode
-- Code Structure with layout of code
+-   Live preview (eye icon in the top right corner / command palette)
+-   Download SVG (in command palette)
+-   Code Structure with layout of code
 
+## TODO
+
+-   Light/dark mode toggle
 
 ## Demo
 
 ![Demo](./dbml-demo.gif)
 
-
 ## Appendix
 
 This extension is a perfect complement to [vscode-dbml](vscode:extension/matt-meyers.vscode-dbml) (color syntaxing and SQL export commands).
-
 
 ## References
 
@@ -30,8 +29,6 @@ Here are some related projects used in this extension
 
 [@softwaretechnik-berlin/dbml-renderer](https://github.com/softwaretechnik-berlin/dbml-renderer/)
 
-
 ## Authors
 
-- [@Durandal14](https://www.github.com/durandal14)
-
+-   [@Durandal14](https://www.github.com/durandal14)
