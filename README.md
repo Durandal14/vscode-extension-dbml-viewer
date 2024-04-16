@@ -5,15 +5,14 @@
 
 An extension for Visual Studio Code that provides real-time rendering of a database schema from the generated DBML code.
 
-## Features
+## Roadmap
 
--   Live preview (eye icon in the top right corner / command palette)
--   Download SVG (in command palette)
--   Code Structure with layout of code
-
-## TODO
-
--   Light/dark mode toggle
+-   [x] ~Live preview (eye icon in the top right corner / command palette)~
+-   [x] ~Download SVG (in command palette)~
+-   [x] ~Code Structure with layout of code~
+-   [ ] Light/dark mode toggle
+-   [ ] Zooming in/out
+-   [ ] Change the ugly logo
 
 ## Demo
 
