@@ -4,6 +4,10 @@ All notable changes to the "dbml-viewer" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.1.0]
+
+Update DBML renderer "@softwaretechnik/dbml-renderer" -> version 1.0.30
+
 ## [Unreleased]
 
-- Initial release
+-   Initial release

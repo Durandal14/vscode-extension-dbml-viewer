@@ -2,9 +2,13 @@
     "name": "dbml-viewer",
     "displayName": "DBML Live Preview",
     "description": "An extension for Visual Studio Code that provides real-time rendering of a database schema from the generated DBML code.",
-    "version": "0.0.2",
+    "version": "0.1.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Durandal14/vscode-extension-dbml-viewer"
+    },
     "icon": "icons/DBMLViewer.png",
-    "publisher": "Nicolas Liger",
+    "publisher": "nicolas-liger",
     "engines": {
         "vscode": "^1.77.0"
     },
