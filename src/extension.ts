@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { run } from '@softwaretechnik/dbml-renderer';
+import { parseTableDefinition } from './parser';
 
 let webviewPanel: vscode.WebviewPanel | null = null;
 
@@ -16,8 +17,8 @@ async function generateSvg(dbmlContent: string): Promise<string> {
         return svgContent;
     } catch (error: unknown) {
         let errorMessage = 'Error generating SVG: Unknown error';
-        if (typeof error === 'object' && error !== null && 'message' in error) {
-            errorMessage = 'Error generating SVG: ' + (error as { message: string }).message;
+        if (error instanceof Error) {
+            errorMessage = 'Error generating SVG: ' + error.message;
         }
         console.error(errorMessage);
         vscode.window.showErrorMessage(errorMessage);
@@ -134,6 +135,34 @@ export function activate(context: vscode.ExtensionContext) {
     // Enregistrement des commandes
     context.subscriptions.push(vscode.commands.registerCommand('extension.generateDbmlGraph', showDbmlGraphWebView));
     context.subscriptions.push(vscode.commands.registerCommand('extension.generateDbmlSvg', saveDbmlAsSvg));
+
+    const disposable = vscode.commands.registerCommand(
+        'dbml-viewer.generateDbmlGraph',
+        async () => {
+            const editor = vscode.window.activeTextEditor;
+            if (!editor) {
+                vscode.window.showErrorMessage('No active editor found.');
+                return;
+            }
+
+            const dbmlContent = editor.document.getText();
+            try {
+                const svgOutput = parseTableDefinition(dbmlContent);
+                vscode.workspace.openTextDocument({ content: svgOutput, language: 'html' })
+                    .then(doc => vscode.window.showTextDocument(doc));
+            } catch (error: unknown) {
+                let errorMessage = 'Error rendering DBML: Unknown error';
+                if (error instanceof Error) {
+                    errorMessage = 'Error rendering DBML: ' + error.message;
+                } else {
+                    errorMessage = 'Unexpected error rendering DBML.';
+                }
+                vscode.window.showErrorMessage(errorMessage);
+            }
+        }
+    );
+
+    context.subscriptions.push(disposable);
 
     // Création du File System Watcher pour les fichiers DBML
     const watcher = vscode.workspace.createFileSystemWatcher('**/*.dbml');

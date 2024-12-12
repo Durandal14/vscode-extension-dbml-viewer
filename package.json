@@ -43,6 +43,10 @@
             {
                 "command": "extension.generateDbmlSvg",
                 "title": "DBML: Download SVG view"
+            },
+            {
+                "command": "dbml-viewer.generateDbmlGraph",
+                "title": "Generate DBML Graph"
             }
         ]
     },
@@ -55,7 +59,8 @@
         "watch-tests": "tsc -p . -w --outDir out",
         "pretest": "npm run compile-tests && npm run compile && npm run lint",
         "lint": "eslint src --ext ts",
-        "test": "node ./out/test/runTest.js"
+        "test": "node ./out/test/runTest.js",
+        "build": "webpack --mode production"
     },
     "devDependencies": {
         "@types/glob": "^8.1.0",
@@ -68,12 +73,13 @@
         "eslint": "^8.39.0",
         "glob": "^8.1.0",
         "mocha": "^10.2.0",
-        "ts-loader": "^9.4.2",
-        "typescript": "^5.0.4",
-        "webpack": "^5.81.0",
-        "webpack-cli": "^5.0.2"
+        "ts-loader": "^9.5.1",
+        "typescript": "^5.7.2",
+        "webpack": "^5.97.1",
+        "webpack-cli": "^5.1.4"
     },
     "dependencies": {
-        "@softwaretechnik/dbml-renderer": "^1.0.30"
+        "@softwaretechnik/dbml-renderer": "^1.0.30",
+        "zod": "^3.22.4"
     }
 }
