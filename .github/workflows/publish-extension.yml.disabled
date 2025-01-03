@@ -25,5 +25,5 @@ jobs:
 
             - name: Publish Extension
               env:
-                  VSCE_PAT: ${{ secrets.VSCE_PAT }} # Utilise le PAT stocké dans les secrets GitHub
+                  VSCE_PAT: $secrets.VSCE_PAT # Utilise le PAT stocké dans les secrets GitHub
               run: vsce publish --pat $VSCE_PAT
