@@ -5,9 +5,37 @@
 
 An extension for Visual Studio Code that provides real-time rendering of a database schema from the generated DBML code.
 
+## Roadmap
+
+-   [x] ~Live preview (eye icon in the top right corner / command palette)~
+-   [x] ~Download SVG (in command palette)~
+-   [x] ~Code Structure with layout of code~
+-   [ ] Light/dark mode toggle
+-   [ ] Zooming in/out
+-   [ ] Change the ugly logo
+
+## Demo
+
+![Demo](./dbml-demo.gif)
+
+## Appendix
+
+This extension is a perfect complement to [vscode-dbml](vscode:extension/matt-meyers.vscode-dbml) (color syntaxing and SQL export commands).
+
+## References
+
+Here are some related projects used in this extension
+
+[@softwaretechnik-berlin/dbml-renderer](https://github.com/softwaretechnik-berlin/dbml-renderer/)
+
+## Authors
+
+-   [@Durandal14](https://www.github.com/durandal14)
+
 ## Installation
 
 1. Clone the repository:
+
     ```sh
     git clone https://github.com/yourusername/vscode-extension-dbml-viewer.git
     cd vscode-extension-dbml-viewer
@@ -21,6 +49,7 @@ An extension for Visual Studio Code that provides real-time rendering of a datab
 ## Build
 
 To build the project, run:
+
 ```sh
 npm run build
 ```
@@ -120,30 +149,3 @@ Enum core.order_status {
   ...
 }
 ```
-
-## Roadmap
-
--   [x] ~Live preview (eye icon in the top right corner / command palette)~
--   [x] ~Download SVG (in command palette)~
--   [x] ~Code Structure with layout of code~
--   [ ] Light/dark mode toggle
--   [ ] Zooming in/out
--   [ ] Change the ugly logo
-
-## Demo
-
-![Demo](./dbml-demo.gif)
-
-## Appendix
-
-This extension is a perfect complement to [vscode-dbml](vscode:extension/matt-meyers.vscode-dbml) (color syntaxing and SQL export commands).
-
-## References
-
-Here are some related projects used in this extension
-
-[@softwaretechnik-berlin/dbml-renderer](https://github.com/softwaretechnik-berlin/dbml-renderer/)
-
-## Authors
-
--   [@Durandal14](https://www.github.com/durandal14)
